@@ -1,9 +1,13 @@
+using Api.Filters;
 using Api.Controllers.Users.Request;
 using Api.Controllers.Users.Response;
 using Api.UseCases.Users.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Users;
+
+[ResponseTimeHeader]
+[StudentInfoHeaders]
 
 /// <summary>
 /// Контроллер работы с пользователями
@@ -29,6 +33,7 @@ public sealed class UsersController : ControllerBase
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Созданный пользователь</returns>
     [HttpPost]
+    [SetName]
     public async Task<ActionResult<UserResponse>> CreateUserAsync(
         [FromBody] CreateUserRequest? request,
         CancellationToken cancellationToken)
