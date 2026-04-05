@@ -2,6 +2,8 @@ using Api.Middleware;
 using Api.Services;
 using Api.UseCases.Users;
 using Api.UseCases.Users.Interfaces;
+using Api.UseCases.Tasks;
+using Api.UseCases.Tasks.Interfaces;
 using Dal;
 using Logic;
 using Microsoft.OpenApi.Models;
@@ -40,7 +42,8 @@ public sealed class Startup
         services.AddLogic();
         
         services.AddScoped<IManageUserUseCase, ManageUserUseCase>();
-        
+        services.AddScoped<IManageTaskUseCase, ManageTaskUseCase>();
+
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(builder =>
@@ -112,15 +115,15 @@ public sealed class Startup
             provider.CompareServices<ITransientService2>();
         }
 
-        if (Environment.IsDevelopment())
-        {
+        //if (Environment.IsDevelopment())
+        //{
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskHub API v1");
             });
-        }
+        //}
 
         app.UseRouting();
 
