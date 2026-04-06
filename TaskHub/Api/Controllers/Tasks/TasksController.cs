@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers.Tasks;
 
 [Route("tasks")]
+[StudentInfoHeadersFilter]
+[RequestLoggingFilter]
 public class TasksController : ControllerBase
 {
     private readonly IManageTaskUseCase _useCase;
@@ -17,6 +19,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
+    [ValidateCreateTaskRequestFilter]
     public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request, CancellationToken ct)
     {
         var result = await _useCase.CreateTaskAsync(request.Title, request.UserId, ct);
@@ -32,7 +35,7 @@ public class TasksController : ControllerBase
     [HttpGet("{id}")]
     [FromRouteTaskId]
     public async Task<ActionResult<TaskResponse>> Get(
-        string id,
+        [FromRouteTaskId] string id,
         CancellationToken ct)
     {
         var guidObj = HttpContext.Items["TaskId"];
@@ -51,8 +54,9 @@ public class TasksController : ControllerBase
 
     [HttpPut("{id}/title")]
     [FromRouteTaskId]
+    [ValidateSetTaskTitleRequestFilter]
     public async Task<IActionResult> SetTitle(
-        string id,
+        [FromRouteTaskId] string id,
         SetTaskTitleRequest request,
         CancellationToken ct)
     {
@@ -71,7 +75,7 @@ public class TasksController : ControllerBase
     [HttpDelete("{id}")]
     [FromRouteTaskId]
     public async Task<IActionResult> Delete(
-        string id,
+        [FromRouteTaskId] string id,
         CancellationToken ct)
     {
         var guidObj = HttpContext.Items["TaskId"];

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Api.Filters;
 
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter)]
 public class FromRouteTaskIdAttribute : Attribute, IActionFilter
 {
     public void OnActionExecuting(ActionExecutingContext context)
