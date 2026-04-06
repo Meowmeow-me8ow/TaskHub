@@ -1,11 +1,11 @@
 ﻿using Api.Controllers.Tasks.Request;
 using Api.Controllers.Tasks.Response;
+using Api.Filters;
 using Api.UseCases.Tasks.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Tasks;
 
-[ApiController]
 [Route("tasks")]
 public class TasksController : ControllerBase
 {
@@ -29,25 +29,60 @@ public class TasksController : ControllerBase
         return Ok(await _useCase.GetAllTasksAsync(ct));
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<TaskResponse>> Get(Guid id, CancellationToken ct)
+    [HttpGet("{id}")]
+    [FromRouteTaskId]
+    public async Task<ActionResult<TaskResponse>> Get(
+        string id,
+        CancellationToken ct)
     {
-        var result = await _useCase.GetTaskByIdAsync(id, ct);
+        var guidObj = HttpContext.Items["TaskId"];
+
+        if (guidObj == null)
+        {
+            return BadRequest("Идентификатор задачи не задан");
+        }
+
+        var guid = (Guid)guidObj;
+        var result = await _useCase.GetTaskByIdAsync(guid, ct);
+
         if (result == null) return NotFound();
         return Ok(result);
     }
 
-    [HttpPut("{id:guid}/title")]
-    public async Task<IActionResult> SetTitle(Guid id, SetTaskTitleRequest request, CancellationToken ct)
+    [HttpPut("{id}/title")]
+    [FromRouteTaskId]
+    public async Task<IActionResult> SetTitle(
+        string id,
+        SetTaskTitleRequest request,
+        CancellationToken ct)
     {
-        await _useCase.SetTaskTitleAsync(id, request.Title!, ct);
+        var guidObj = HttpContext.Items["TaskId"];
+
+        if (guidObj == null)
+        {
+            return BadRequest("Идентификатор задачи не задан");
+        }
+
+        var guid = (Guid)guidObj;
+        await _useCase.SetTaskTitleAsync(guid, request.Title!, ct);
         return NoContent();
     }
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    [HttpDelete("{id}")]
+    [FromRouteTaskId]
+    public async Task<IActionResult> Delete(
+        string id,
+        CancellationToken ct)
     {
-        var deleted = await _useCase.DeleteTaskByIdAsync(id, ct);
+        var guidObj = HttpContext.Items["TaskId"];
+
+        if (guidObj == null)
+        {
+            return BadRequest("Идентификатор задачи не задан");
+        }
+
+        var guid = (Guid)guidObj;
+        var deleted = await _useCase.DeleteTaskByIdAsync(guid, ct);
         return deleted ? NoContent() : NotFound();
     }
 
